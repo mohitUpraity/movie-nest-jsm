@@ -20,11 +20,13 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // main function that fetches movies
-  const fetchMovies = async () => {
+  const fetchMovies = async (query = "") => {
     setIsLoading(true);
     setErrorMessage("");
     try {
-      const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+      const endpoint = query
+        ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+        : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
       const response = await fetch(endpoint, API_OPTIONS);
       // alert(response);
       if (!response.ok) {
@@ -46,8 +48,8 @@ const App = () => {
     }
   };
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    fetchMovies(searchTerm);
+  }, [searchTerm]);
   return (
     <main>
       <div className="pattern" />
@@ -61,7 +63,7 @@ const App = () => {
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
         <section className="all-movies">
-          <h2 className='mt-[20px]'>All movies</h2>
+          <h2 className="mt-[20px]">All movies</h2>
           {isLoading ? (
             <Spinner />
           ) : errorMessage ? (
@@ -69,8 +71,7 @@ const App = () => {
           ) : (
             <ul>
               {movies.map((movie) => (
-                <MovieCard key= {movie.id} movie={movie} />
-          
+                <MovieCard key={movie.id} movie={movie} />
               ))}
             </ul>
           )}
